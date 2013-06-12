@@ -5,7 +5,8 @@
 //     Dependencies are updated and now it uses functions from isJS and SHJS.
 
 var PersistentStorage = (function() {
-  var ls = window.localStorage, methods;
+  var ls = window.localStorage, 
+      methods = null;
 
   function PersistentStorage(namespace) {
     this.prefix = ['__', namespace, '__'].join('');
@@ -39,7 +40,7 @@ var PersistentStorage = (function() {
       },
 
       set: function(key, val, ttl) {
-        if (utils.isNumber(ttl)) {
+        if (is.Numeric(ttl)) {
           ls.setItem(this._ttlKey(key), encode(now() + ttl));
         }else {
           ls.removeItem(this._ttlKey(key));
@@ -75,7 +76,7 @@ var PersistentStorage = (function() {
       isExpired: function(key) {
         var ttl = decode(ls.getItem(this._ttlKey(key)));
 
-        return utils.isNumber(ttl) && now() > ttl ? true : false;
+        return is.Numeric(ttl) && now() > ttl ? true : false;
       }
     };
   }
@@ -100,7 +101,7 @@ var PersistentStorage = (function() {
 
   function encode(val) {
     // convert undefined to null to avoid issues with JSON.parse
-    return JSON.stringify(utils.isUndefined(val) ? null : val);
+    return JSON.stringify(is.Undefined(val) ? null : val);
   }
 
   function decode(val) {
